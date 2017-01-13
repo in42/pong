@@ -165,10 +165,25 @@ function drawScore() {
 	
 	
 }
+
+function intelligentPlay(ball,paddle1){
+	if(ball.pos.x==canvas.width-50 && ball.vel.x<0){
+		
+		if(ball.vel.y>0)
+			paddle1.vel_y=Math.abs(paddle1.vel_y);
+		else
+			paddle1.vel_y=-1*Math.abs(paddle1.vel_y);
+			
+	}
+		
+	
+	
+}
 function drawGameState() {
 	draw_board();
 	drawScore();
 	ball.draw();
+	intelligentPlay(ball,paddle1);
 	paddle1.move();
 	paddle2.move2();
 	collisionLeft(ball,paddle1);
