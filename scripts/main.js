@@ -2,7 +2,9 @@ var canvas = document.getElementById("game-canvas");
 var context = canvas.getContext("2d");
 var upPressed = false;
 var downPressed = false;
-
+var score1=0;
+var score2=0;
+var turn=1;
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -25,8 +27,8 @@ function keyUpHandler(e) {
 
 function mouseMoveHandler(e) {
     var relativeY = e.clientY;
-    if(relativeY  > 0 && relativeY < canvas.width) {
-        paddle2.pos.y = relativeY - PADDLE_HALF_LENGTH;
+    if(relativeY  > 50+PADDLE_HALF_LENGTH && relativeY < canvas.height) {
+        paddle2.pos.y = relativeY 
     }
 }
 function Pos(x, y) {
@@ -56,14 +58,20 @@ function Ball(pos, vel) {
 	}
 
 	this.move = function() {
-		if (this.pos.x +this.vel.x- BALL_RADIUS <0 ||
-				this.pos.x +this.vel.x + BALL_RADIUS >= canvas.width) {
+		if (this.pos.x +this.vel.x- BALL_RADIUS <0)
+				 {
 			//this.vel.x=-this.vel.x;
 			//this.pos.x+=this.vel.x * dt;
+			score2+=1;
 			return false;
 		}
+		else if (this.pos.x +this.vel.x + BALL_RADIUS >= canvas.width){
+			score1+=1;
+			return false;
+			
+		}
 
-		if (this.pos.y + this.vel.y - BALL_RADIUS <0 ||
+		if (this.pos.y + this.vel.y - BALL_RADIUS <50||
 				this.pos.y + this.vel.y + BALL_RADIUS > canvas.height  ) {
 			this.vel.y = -this.vel.y;
 		}
@@ -79,7 +87,7 @@ var PADDLE_HALF_LENGTH = 25;
 
 function Paddle(pos) {
 	this.pos = pos;
-	this.vel_y = 1;
+	this.vel_y = 2;
 	this.move_up = function() {
 		pos.y -= this.vel_y ;
 	};
@@ -94,13 +102,13 @@ function Paddle(pos) {
 	}
 	
 	this.move = function(){
-		if(this.pos.y + PADDLE_HALF_LENGTH + this.vel_y > canvas.height || this.pos.y -PADDLE_HALF_LENGTH + this.vel_y <0 )
+		if(this.pos.y + PADDLE_HALF_LENGTH + this.vel_y > canvas.height || this.pos.y -PADDLE_HALF_LENGTH + this.vel_y <50 )
 			this.vel_y= -this.vel_y ;
 		this.pos.y += this.vel_y;
 	}
 	
 	this.move2=function(){
-		if(upPressed && this.pos.y - PADDLE_HALF_LENGTH - this.vel_y > 0) {
+		if(upPressed && this.pos.y - PADDLE_HALF_LENGTH - this.vel_y > 50) {
 			this.move_up();
     }
     else if(downPressed && this.pos.y + PADDLE_HALF_LENGTH + this.vel_y < canvas.height) {
@@ -117,15 +125,19 @@ function draw_board() {
 	context.lineTo(canvas.width / 2, canvas.height - 1);
 	context.moveTo(canvas.width / 2 - 1, canvas.height - 1);
 	context.lineTo(canvas.width / 2 - 1, 0);
+	context.moveTo(0, 50);
+	context.lineTo(canvas.width , 50)
+	context.moveTo(0, 52);
+	context.lineTo(canvas.width , 52)
 	context.stroke();
 	context.closePath();
 }
 
-var BALL_START_POS = new Pos(canvas.width / 2, BALL_RADIUS); //We are maintaing the centre of the balll in {pos}
+var BALL_START_POS = new Pos(canvas.width / 2, BALL_RADIUS+50); //We are maintaing the centre of the balll in {pos}
 var PADDLE1_START_POS = new Pos(9, canvas.height / 2); // We are maintaining the centre of the rectangle in { pos}
 var PADDLE2_START_POS = new Pos(canvas.width - 1 - 9, canvas.height / 2);
 
-var ball = new Ball(BALL_START_POS, new Velocity(-5, 5));
+var ball = new Ball(BALL_START_POS, new Velocity(5, 5));
 var paddle1 = new Paddle(PADDLE1_START_POS);
 var paddle2 = new Paddle(PADDLE2_START_POS);
 //var lastDrawnTime = new Date().getTime();
@@ -141,8 +153,21 @@ function collisionRight(ball,paddle){
 		ball.vel.x=-ball.vel.x;
 	
 }
+
+function drawScore() {
+    context.font = "bolder 20px Arial";
+    context.fillStyle = "#FFFFFF";
+	
+    context.fillText("Score:", 8, 30);
+	context.fillText(score1, canvas.width/4+0, 30)
+	context.fillText(score2, canvas.width*3/4, 30)
+	
+	
+	
+}
 function drawGameState() {
 	draw_board();
+	drawScore();
 	ball.draw();
 	paddle1.move();
 	paddle2.move2();
@@ -151,6 +176,7 @@ function drawGameState() {
 	paddle1.draw();
 	
 	paddle2.draw();
+	
 	//lastDrawnTime = new Date().getTime();
 }
 
@@ -164,6 +190,15 @@ window.main = function() {
 	else{
 		//alert("LOST GAME OVER");
 		//document.location.reload();
+		ball.pos.x=canvas.width / 2;
+		ball.pos.y=BALL_RADIUS+50;
+		paddle1.pos.x=9;
+		paddle1.pos.y=canvas.height / 2;
+		paddle2.pos.x=canvas.width - 1 - 9;
+		paddle2.pos.y=canvas.height / 2;
+		ball.vel.x=5*turn;
+		ball.vel.y=5;
+		turn=-turn;
 	}
 	
 }
