@@ -1,0 +1,3 @@
+* try to add sound
+* Improve paddle collision
+* Make cpu weaker
