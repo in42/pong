@@ -111,6 +111,8 @@ game.PADDLE_HALF_BREADTH = 5;
 game.PADDLE_HALF_LENGTH = 35;
 game.PADDLE_VELOCITY_Y = 300;
 
+game.paddleBallCollisionSound = new Audio("sounds/paddle_ball_collision.wav");
+
 function Paddle(pos) {
 	this.pos = Object.assign({}, pos);
 	this.velY = game.PADDLE_VELOCITY_Y;
@@ -141,6 +143,7 @@ function Paddle(pos) {
 					ball.pos.x - game.BALL_RADIUS <= this.pos.x +
 						game.PADDLE_HALF_BREADTH) {
 				ball.vel.x = -ball.vel.x;
+				game.paddleBallCollisionSound.play();
 			}
 		} else {
 			if (ball.vel.x > 0 &&
@@ -149,6 +152,7 @@ function Paddle(pos) {
 					ball.pos.x + game.BALL_RADIUS >= this.pos.x -
 						game.PADDLE_HALF_BREADTH) {
 				ball.vel.x = -ball.vel.x;
+				game.paddleBallCollisionSound.play();
 			}
 		}
 	}
