@@ -198,7 +198,7 @@ var BALL_START_POS = new Pos(canvas.width / 2, BALL_RADIUS); //We are maintaing 
 var CPU_PADDLE_START_POS = new Pos(PADDLE_DIST_FROM_END, canvas.height / 2); // We are maintaining the centre of the rectangle in { pos}
 var PLAYER_PADDLE_START_POS = new Pos(canvas.width - 1 - PADDLE_DIST_FROM_END,
 	canvas.height / 2);
-var BALL_START_VEL = new Velocity(300, 300);
+var BALL_START_VEL = new Velocity(-300, 300);
 
 var ball = new Ball(BALL_START_POS, BALL_START_VEL);
 var cpuPaddle = new Paddle(CPU_PADDLE_START_POS);
@@ -236,10 +236,19 @@ function intelligentPlay(ball,cpuPaddle){
 	}
 }
 
+cpuPaddle.move = function(nSecsPassed, ball) {
+	if (ball.pos.y > cpuPaddle.pos.y) {
+		cpuPaddle.moveDown(nSecsPassed);
+	} else if (ball.pos.y < cpuPaddle.pos.y) {
+		cpuPaddle.moveUp(nSecsPassed);
+	}
+}
+
 function updateGameState() {
 	ball.handleCollisionsWithWall();
 	playerPaddle.tryToHitBall(ball);
 	cpuPaddle.tryToHitBall(ball);
+
 	var now = new Date().getTime();
 	var nSecsPassed = (now - lastDrawnTime) / 1000;
 	// var nSecsPassed = 1 / 60;
@@ -251,7 +260,8 @@ function updateGameState() {
 			playerPaddle.moveDown(nSecsPassed);
 		}
 	}
-	cpuPaddle.moveUp(nSecsPassed);
+	cpuPaddle.move(nSecsPassed, ball);
+
 	var ret = ball.move(nSecsPassed, cpuPaddle, playerPaddle);
 
 	if (ret) {
