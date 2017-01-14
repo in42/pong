@@ -16,7 +16,7 @@ document.addEventListener("keyup", keyUpHandler, false);
 function keyDownHandler(e) {
     if (e.keyCode == 38) {
         upPressed = true;
-    } else if(e.keyCode == 40) {
+    } else if (e.keyCode == 40) {
         downPressed = true;
     }
 }
@@ -24,7 +24,7 @@ function keyDownHandler(e) {
 function keyUpHandler(e) {
     if (e.keyCode == 38) {
         upPressed = false;
-    } else if(e.keyCode == 40) {
+    } else if (e.keyCode == 40) {
         downPressed = false;
     }
 }
@@ -39,7 +39,7 @@ function Velocity(vX, vY) {
 	this.y = vY;
 }
 
-game.BALL_RADIUS = 5;
+game.BALL_RADIUS = 7;
 
 function Ball(pos, vel) {
 	this.pos = Object.assign({}, pos);
@@ -106,8 +106,8 @@ function Ball(pos, vel) {
 	}
 }
 
-game.PADDLE_HALF_BREADTH = 4;
-game.PADDLE_HALF_LENGTH = 25;
+game.PADDLE_HALF_BREADTH = 5;
+game.PADDLE_HALF_LENGTH = 35;
 game.PADDLE_VELOCITY_Y = 300;
 
 function Paddle(pos) {
@@ -159,7 +159,7 @@ function Paddle(pos) {
 	}
 }
 
-game.PADDLE_DIST_FROM_END = 9;
+game.PADDLE_DIST_FROM_END = 20;
 // We are maintaing the centre of the ball in {pos}
 game.BALL_START_POS = new Pos(canvas.width / 2, game.BALL_RADIUS);
 // We are maintaining the centre of the rectangle in { pos}
@@ -203,11 +203,11 @@ game.drawBoard = function () {
 }
 
 game.drawScore = function () {
-    context.font = "bolder 30px Arial";
+    context.font = "bolder 50px Arial";
     context.fillStyle = "white";
 	
-	context.fillText(game.cpuScore, canvas.width / 4 + 0, 50)
-	context.fillText(game.playerScore, canvas.width * 3 / 4, 50)
+	context.fillText(game.cpuScore, canvas.width / 4 + 0, 100)
+	context.fillText(game.playerScore, canvas.width * 3 / 4, 100)
 }
 
 game.updateGameState = function () {
