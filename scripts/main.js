@@ -4,12 +4,9 @@ var upPressed = false;
 var downPressed = false;
 var cpuScore=0;
 var playerScore=0;
-var turn=1;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
-
-// document.addEventListener("mousemove", mouseMoveHandler, false);
 
 function keyDownHandler(e) {
     if (e.keyCode == 38) {
@@ -26,13 +23,6 @@ function keyUpHandler(e) {
         downPressed = false;
     }
 }
-
-// function mouseMoveHandler(e) {
-//     var relativeY = e.clientY;
-//     if(relativeY  > 50+PADDLE_HALF_LENGTH && relativeY < canvas.height) {
-//         playerPaddle.pos.y = relativeY 
-//     }
-// }
 
 function Pos(x, y) {
 	this.x = x;
@@ -52,12 +42,10 @@ function Ball(pos, vel) {
 
 	this.move = function(dt, leftPaddle, rightPaddle) {
 		var dPos = new Pos(this.vel.x * dt, this.vel.y * dt);
-		if (this.pos.x + dPos.x < 0) {
-			//this.vel.x=-this.vel.x;
-			//this.pos.x+=this.vel.x * dt;
+		if (this.pos.x + dPos.x + BALL_RADIUS < 0) {
 			playerScore += 1;
 			return false;
-		} else if (this.pos.x + dPos.x >= canvas.width) {
+		} else if (this.pos.x + dPos.x - BALL_RADIUS>= canvas.width) {
 			cpuScore += 1;
 			return false;
 		}
@@ -162,21 +150,6 @@ function Paddle(pos) {
 				this.pos.y - PADDLE_HALF_LENGTH,
 				2 * PADDLE_HALF_BREADTH, 2 * PADDLE_HALF_LENGTH);
 	}
-	
-	this.move = function() {
-		if(this.pos.y + PADDLE_HALF_LENGTH + this.velY > canvas.height || this.pos.y -PADDLE_HALF_LENGTH + this.velY <50 )
-			this.velY= -this.velY ;
-		this.pos.y += this.velY;
-	}
-	
-	this.move2 = function() {
-		if(upPressed && this.pos.y - PADDLE_HALF_LENGTH - this.velY > 50) {
-			this.moveUp();
-		}
-		else if(downPressed && this.pos.y + PADDLE_HALF_LENGTH + this.velY < canvas.height) {
-			this.moveDown();
-		}
-	}
 }
 
 function drawBoard() {
@@ -186,10 +159,6 @@ function drawBoard() {
 	context.lineTo(canvas.width / 2, canvas.height - 1);
 	context.moveTo(canvas.width / 2 - 1, canvas.height - 1);
 	context.lineTo(canvas.width / 2 - 1, 0);
-	// context.moveTo(0, 50);
-	// context.lineTo(canvas.width , 50)
-	// context.moveTo(0, 52);
-	// context.lineTo(canvas.width , 52)
 	context.stroke();
 	context.closePath();
 }
@@ -209,13 +178,7 @@ function initBoard() {
 	ball = new Ball(BALL_START_POS, ballStartVel);
 	cpuPaddle = new Paddle(CPU_PADDLE_START_POS);
 	playerPaddle = new Paddle(PLAYER_PADDLE_START_POS);
-	// cpuPaddle.velY = 2 * cpuPaddle.velY;
 	cpuPaddle.move = function(nSecsPassed, ball) {
-		// if (ball.vel.y > 0) {
-		// 	cpuPaddle.moveDown(nSecsPassed);
-		// } else if (ball.vel.y < 0) {
-		// 	cpuPaddle.moveUp(nSecsPassed);
-		// }
 		if (cpuPaddle.pos.x < ball.pos.x && ball.vel.x < 0 ||
 				cpuPaddle.pos.x > ball.pos.x && ball.vel.x > 0) {
 			if (ball.pos.y > cpuPaddle.pos.y) {
@@ -245,7 +208,6 @@ function drawScore() {
     context.font = "bolder 30px Arial";
     context.fillStyle = "white";
 	
-    // context.fillText("Score:", 8, 30);
 	context.fillText(cpuScore, canvas.width/4+0, 50)
 	context.fillText(playerScore, canvas.width*3/4, 50)
 }
@@ -289,13 +251,6 @@ function drawGameState() {
 	drawBoard();
 	drawScore();
 	ball.draw();
-	// intelligentPlay(ball,cpuPaddle);
-	// cpuPaddle.move();
-	// playerPaddle.move2();
-	// collisionLeft(ball,cpuPaddle);
-	// collisionRight(ball,playerPaddle);
-	// cpuPaddle.draw();
-	
 	playerPaddle.draw();
 	cpuPaddle.draw();
 	
