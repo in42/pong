@@ -94,7 +94,8 @@ function Ball(pos, vel) {
 	this.handleCollisionsWithWall = function () {
 		if (this.pos.y <= game.BALL_RADIUS - 1 && this.vel.y < 0) {
 			this.vel.y = -this.vel.y;
-		} else if (this.pos.y >= canvas.height - game.BALL_RADIUS) {
+		} else if (this.pos.y >= canvas.height - game.BALL_RADIUS &&
+			this.vel.y > 0) {
 			this.vel.y = -this.vel.y;
 		}
 	}
