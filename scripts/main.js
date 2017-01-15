@@ -15,17 +15,17 @@ document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
 function keyDownHandler(e) {
-    if (e.keyCode == 38) {
+    if (e.keyCode == 87) {
         upPressed = true;
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode == 83) {
         downPressed = true;
     }
 }
 
 function keyUpHandler(e) {
-    if (e.keyCode == 38) {
+    if (e.keyCode == 87) {
         upPressed = false;
-    } else if (e.keyCode == 40) {
+    } else if (e.keyCode == 83) {
         downPressed = false;
     }
 }
@@ -194,10 +194,10 @@ game.PADDLE_DIST_FROM_END = 40;
 // We are maintaing the centre of the ball in {pos}
 game.BALL_START_POS = new Pos(canvas.width / 2, game.BALL_RADIUS);
 // We are maintaining the centre of the rectangle in { pos}
-game.CPU_PADDLE_START_POS = new Pos(game.PADDLE_DIST_FROM_END,
+game.CPU_PADDLE_START_POS = new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END,
 	canvas.height / 2); 
 game.PLAYER_PADDLE_START_POS =
-	new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END, canvas.height / 2);
+	new Pos(game.PADDLE_DIST_FROM_END, canvas.height / 2);
 game.ballStartVel = new Velocity(500, 500);
 
 game.ball = null;

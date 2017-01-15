@@ -3,8 +3,19 @@
 	margin: 0;
 } */
 
-canvas {
+body {
+	text-align: center;
+}
+
+#game-canvas {
 	background: #000;
 	display: block;
 	margin: 0 auto;
+	padding: 1em;
+}
+
+#instructions {
+	/* display: block;
+	margin: 0 auto; */
+	font: 1em "Open Sans", sans-serif;
 }
