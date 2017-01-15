@@ -113,7 +113,7 @@ function Ball(pos, vel) {
 }
 
 game.PADDLE_HALF_BREADTH = 5;
-game.PADDLE_HALF_LENGTH = 35;
+game.PADDLE_HALF_LENGTH = 40;
 game.PADDLE_VELOCITY_Y = 500;
 
 game.paddleBallCollisionSound = new Audio("sounds/paddle_ball_collision.wav");
@@ -180,12 +180,13 @@ function Paddle(pos) {
 
 	this.handleCollision = function (ball) {
 		var angle = this.calculateBounceAngle(ball);
-		var ballSpeed =
-			Math.sqrt(ball.vel.x * ball.vel.x +
-					ball.vel.y * ball.vel.y);
-		ball.vel.x = -Math.sign(ball.vel.x) * ballSpeed *
+		// var ballSpeed =
+		// 	Math.sqrt(ball.vel.x * ball.vel.x +
+		// 			ball.vel.y * ball.vel.y);
+		var hitSpeed = 750;
+		ball.vel.x = -Math.sign(ball.vel.x) * hitSpeed *
 			Math.cos(angle);
-		ball.vel.y = -ballSpeed * Math.sin(angle);
+		ball.vel.y = -hitSpeed * Math.sin(angle);
 		// ball.vel.x = -ball.vel.x;
 		game.paddleBallCollisionSound.play();
 	}
@@ -193,13 +194,14 @@ function Paddle(pos) {
 
 game.PADDLE_DIST_FROM_END = 40;
 // We are maintaing the centre of the ball in {pos}
-game.BALL_START_POS = new Pos(canvas.width / 2, game.BALL_RADIUS);
+game.BALL_START_POS = new Pos(canvas.width / 2, canvas.height / 2);
 // We are maintaining the centre of the rectangle in { pos}
 game.CPU_PADDLE_START_POS = new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END,
 	canvas.height / 2); 
 game.PLAYER_PADDLE_START_POS =
 	new Pos(game.PADDLE_DIST_FROM_END, canvas.height / 2);
-game.ballStartVel = new Velocity(-500, 500);
+game.BALL_START_SPEED = 450;
+game.ballStartVel = new Velocity(-game.BALL_START_SPEED, 0);
 
 game.ball = null;
 game.cpuPaddle = null;
@@ -211,10 +213,10 @@ game.initBoard = function () {
 	this.playerPaddle = new Paddle(this.PLAYER_PADDLE_START_POS);
 	this.cpuPaddle.dir = 0;
 	this.cpuPaddle.takeDecision = function (ball) {
-		/* if (ball.pos.y > this.pos.y - game.PADDLE_HALF_LENGTH &&
-				ball.pos.y < this.pos.y + game.PADDLE_HALF_LENGTH) {
+		if (ball.pos.y > this.pos.y - game.PADDLE_HALF_LENGTH / 2 &&
+				ball.pos.y < this.pos.y + game.PADDLE_HALF_LENGTH / 2) {
 			this.dir = 0;
-		} else */ if (this.pos.x < ball.pos.x && ball.vel.x < 0 ||
+		} else if (this.pos.x < ball.pos.x && ball.vel.x < 0 ||
 				this.pos.x > ball.pos.x && ball.vel.x > 0) {
 			if (ball.pos.y > this.pos.y) {
 				this.dir = -1;
@@ -249,14 +251,14 @@ game.drawBoard = function () {
 }
 
 game.drawScore = function () {
-    context.font = "bolder 50px Arial";
+    context.font = "bolder 80px Arial";
     context.fillStyle = "white";
 	
-	context.fillText(game.cpuScore, canvas.width / 4 + 0, 100)
-	context.fillText(game.playerScore, canvas.width * 3 / 4, 100)
+	context.fillText(game.cpuScore, canvas.width / 4 + 0, 330)
+	context.fillText(game.playerScore, canvas.width * 3 / 4, 330)
 }
 
-game.N_FRAMES_BETWEEN_CPU_DECISION = 10;
+game.N_FRAMES_BETWEEN_CPU_DECISION = 6;
 game.n_frames_from_last_decision = 0;
 
 game.updateGameState = function () {
@@ -278,7 +280,9 @@ game.updateGameState = function () {
 
 	if (this.n_frames_from_last_decision % this.N_FRAMES_BETWEEN_CPU_DECISION == 0) {
 		this.cpuPaddle.takeDecision(this.ball);
-		this.n_frames_from_last_decision = 0;
+		this.n_frames_from_last_decision = 1;
+	} else {
+		this.n_frames_from_last_decision++;
 	}
 
 	this.cpuPaddle.move(nSecsPassed);
