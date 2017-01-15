@@ -1,3 +1,4 @@
-* try to add sound
+* try to add sound - used c4 for ball wall collision, around a4 for paddle
+	ball collision
 * Improve paddle collision
 * Make cpu weaker

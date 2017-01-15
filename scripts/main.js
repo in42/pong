@@ -96,7 +96,7 @@ function Ball(pos, vel) {
 	this.handleCollisionsWithWall = function () {
 		if (this.pos.y <= game.BALL_RADIUS - 1 && this.vel.y < 0) {
 			this.vel.y = -this.vel.y;
-			game.paddleBallCollisionSound.play();
+			game.ballWallCollisionSound.play();
 		} else if (this.pos.y >= canvas.height - game.BALL_RADIUS &&
 			this.vel.y > 0) {
 			this.vel.y = -this.vel.y;
@@ -190,7 +190,7 @@ function Paddle(pos) {
 	}
 }
 
-game.PADDLE_DIST_FROM_END = 20;
+game.PADDLE_DIST_FROM_END = 40;
 // We are maintaing the centre of the ball in {pos}
 game.BALL_START_POS = new Pos(canvas.width / 2, game.BALL_RADIUS);
 // We are maintaining the centre of the rectangle in { pos}
