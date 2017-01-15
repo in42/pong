@@ -48,13 +48,14 @@ function Ball(pos, vel) {
 	this.vel = Object.assign({}, vel);
 
 	this.move = function(dt, leftPaddle, rightPaddle) {
+		var ret = true;
 		var dPos = new Pos(this.vel.x * dt, this.vel.y * dt);
-		if (this.pos.x + dPos.x + game.BALL_RADIUS < 0) {
+		if (this.pos.x + game.BALL_RADIUS < 0) {
 			game.playerScore += 1;
-			return false;
-		} else if (this.pos.x + dPos.x - game.BALL_RADIUS>= canvas.width) {
+			ret = false;
+		} else if (this.pos.x - game.BALL_RADIUS >= canvas.width) {
 			game.cpuScore += 1;
-			return false;
+			ret = false;
 		}
 
 		var canMoveNormally = true;
@@ -90,7 +91,7 @@ function Ball(pos, vel) {
 			this.pos.y += dPos.y ;
 		}
 
-		return true;
+		return ret;
 	}
 
 	this.handleCollisionsWithWall = function () {
@@ -198,7 +199,7 @@ game.CPU_PADDLE_START_POS = new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END
 	canvas.height / 2); 
 game.PLAYER_PADDLE_START_POS =
 	new Pos(game.PADDLE_DIST_FROM_END, canvas.height / 2);
-game.ballStartVel = new Velocity(500, 500);
+game.ballStartVel = new Velocity(-500, 500);
 
 game.ball = null;
 game.cpuPaddle = null;
@@ -268,6 +269,8 @@ game.updateGameState = function () {
 	}
 }
 
+game.lastDrawnTime = null;
+
 game.drawGameState = function () {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	this.drawBoard();
@@ -280,17 +283,33 @@ game.drawGameState = function () {
 }
 
 game.drawGameState();
-game.lastDrawnTime = new Date().getTime();
+game.turn = 1;
+
+game.start = function () {
+	console.log("hello");
+	this.ballStartVel.x *= this.turn;
+	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
+	this.turn *= -1;
+	this.running = true;
+	game.drawGameState();
+}
+
+game.running = true;
 
 window.main = function () {
 	window.requestAnimationFrame(main);
-
-	if (game.updateGameState()) {
+	if (game.running) {
+		var ret = game.updateGameState();
 		game.drawGameState();
-	} else {
-		game.ballStartVel.x = -game.ballStartVel.x
-		game.ball = new Ball(game.BALL_START_POS, game.ballStartVel);
+		if (!ret) {
+			game.running = false;
+			game.ball.vel = new Velocity(0, 0);
+			setTimeout(function() {
+				window.game.start();
+			}, 500);
+		}
 	}
+
 }
 
 main();
