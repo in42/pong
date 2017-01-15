@@ -113,7 +113,7 @@ function Ball(pos, vel) {
 }
 
 game.PADDLE_HALF_BREADTH = 5;
-game.PADDLE_HALF_LENGTH = 45;
+game.PADDLE_HALF_LENGTH = 50;
 game.PADDLE_VELOCITY_Y = 550;
 
 game.paddleBallCollisionSound = new Audio("sounds/paddle_ball_collision.wav");
@@ -200,7 +200,7 @@ game.CPU_PADDLE_START_POS = new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END
 	canvas.height / 2); 
 game.PLAYER_PADDLE_START_POS =
 	new Pos(game.PADDLE_DIST_FROM_END, canvas.height / 2);
-game.BALL_START_SPEED = 380;
+game.BALL_START_SPEED = 350;
 game.ballStartVel = new Velocity(-game.BALL_START_SPEED, 0);
 
 game.ball = null;
