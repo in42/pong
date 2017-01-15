@@ -28,12 +28,14 @@ function keyDownHandler(e) {
     } else if (e.keyCode == KEY_S) {
         window.downPressed = true;
     } else if (e.keyCode == KEY_Q) {
-		window.game.isRunning = !game.isRunning;
-		if (window.game.isRunning == true) {
-			window.game.drawGameState();
-			$("#message").text("Score " + game.WINNING_SCORE + " to win!");
-		} else {
-			$("#message").text("Press Q to start.");
+		if (game.canStart) {
+			window.game.isRunning = !game.isRunning;
+			if (window.game.isRunning == true) {
+				window.game.drawGameState();
+				$("#message").text("Score " + game.WINNING_SCORE + " to win!");
+			} else {
+				$("#message").text("Press Q to start.");
+			}
 		}
 	} else if (e.keyCode == KEY_R) {
 		if (window.game.canStart == false) {
@@ -251,7 +253,7 @@ game.drawScore = function () {
 	context.fillText(game.cpuScore, canvas.width * 3 / 4 - 30, 330)
 }
 
-game.N_FRAMES_BETWEEN_CPU_DECISION = 12;
+game.N_FRAMES_BETWEEN_CPU_DECISION = 20;
 game.n_frames_from_last_decision = 0;
 
 game.updateGameState = function () {
