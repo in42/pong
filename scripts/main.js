@@ -2,6 +2,9 @@ var canvas = document.getElementById("game-canvas");
 canvas.focus();
 var context = canvas.getContext("2d");
 
+document.addEventListener("keydown", keyDownHandler, false);
+document.addEventListener("keyup", keyUpHandler, false);
+
 // variables to check if the up or down keys are pressed or not
 var upPressed = false;
 var downPressed = false;
@@ -14,18 +17,27 @@ game.playerScore=0;
 var KEY_W = 87;
 var KEY_S = 83;
 var KEY_P = 80;
+var KEY_R = 82
 var ARROW_UP = 26;
 var ARROW_DOWN = 28;
 
 function keyDownHandler(e) {
     if (e.keyCode == KEY_W) {
-        upPressed = true;
+        window.upPressed = true;
     } else if (e.keyCode == KEY_S) {
-        downPressed = true;
+        window.downPressed = true;
     } else if (e.keyCode == KEY_P) {
-		game.isRunning = !game.isRunning;
-		if (game.isRunning == true) {
-			game.drawGameState();
+		window.game.isRunning = !game.isRunning;
+		if (window.game.isRunning == true) {
+			window.game.drawGameState();
+			$("#message").text("Score " + game.WINNING_SCORE + " to win!");
+		} else {
+			$("#message").text("Press P to start.");
+		}
+	} else if (e.keyCode == KEY_R) {
+		if (window.game.canStart == false) {
+			window.game.canStart = true;
+			window.game.startGame();
 		}
 	}
 }
@@ -95,7 +107,7 @@ function Ball(pos, vel) {
 
 game.PADDLE_HALF_BREADTH = 5;
 game.PADDLE_HALF_LENGTH = 50;
-game.PADDLE_VELOCITY_Y = 550;
+game.PADDLE_VELOCITY_Y = 525;
 
 game.paddleBallCollisionSound = new Audio("sounds/paddle_ball_collision.wav");
 
@@ -311,39 +323,36 @@ game.nextServe = function () {
 game.WINNING_SCORE = 7;
 
 game.startGame = function () {
-	game.initBoard();
-	game.turn = 1;
-	game.n_frames_from_last_decision = 0;
-	game.isRunning = true;
-	game.cpuScore=0;
-	game.playerScore=0;
-	game.drawGameState();
-	game.winner = null;
-	document.addEventListener("keydown", keyDownHandler, false);
-	document.addEventListener("keyup", keyUpHandler, false);
-
+	this.initBoard();
+	this.turn = 1;
+	this.n_frames_from_last_decision = 0;
+	this.isRunning = true;
+	this.cpuScore=0;
+	this.playerScore=0;
+	this.drawGameState();
+	this.winner = null;
+	this.isRunning = false;
+	$("#message").text("Press P to start.");
 }
 
+game.canStart = true;
 game.startGame();
+
 game.nextGame = function(previousWinner) {
-	game.winner = previousWinner;
-	document.removeEventListener("keydown", keyDownHandler, false);
-	document.removeEventListener("keyup", keyUpHandler, false);
+	this.winner = previousWinner;
 	setTimeout(function() {
-		var ret = null;
-		if (previousWinner == "player") {
-			ret = window.confirm("You won! Restart game?");
+		if (window.game.winner == "player") {
+			$("#message").text("You won! Press R to start a new game");
 		} else {
-			ret = window.confirm("You lost! Restart game?");
+			$("#message").text("You lost! Press R to start a new game");
 		}
-		game.startGame();
-		game.isRunning = ret;
+		window.game.canStart = false;
 	}, 10);
 }
 
 window.main = function () {
 	window.requestAnimationFrame(main);
-	if (game.isRunning) {
+	if (game.canStart && game.isRunning) {
 		var ret = game.updateGameState();
 		game.drawGameState();
 		if (!ret) {
