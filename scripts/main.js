@@ -209,14 +209,28 @@ game.initBoard = function () {
 	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
 	this.cpuPaddle = new Paddle(this.CPU_PADDLE_START_POS);
 	this.playerPaddle = new Paddle(this.PLAYER_PADDLE_START_POS);
-	this.cpuPaddle.move = function(nSecsPassed, ball) {
-		if (this.pos.x < ball.pos.x && ball.vel.x < 0 ||
+	this.cpuPaddle.dir = 0;
+	this.cpuPaddle.takeDecision = function (ball) {
+		/* if (ball.pos.y > this.pos.y - game.PADDLE_HALF_LENGTH &&
+				ball.pos.y < this.pos.y + game.PADDLE_HALF_LENGTH) {
+			this.dir = 0;
+		} else */ if (this.pos.x < ball.pos.x && ball.vel.x < 0 ||
 				this.pos.x > ball.pos.x && ball.vel.x > 0) {
 			if (ball.pos.y > this.pos.y) {
-				this.moveDown(nSecsPassed);
+				this.dir = -1;
 			} else if (ball.pos.y < this.pos.y) {
-				this.moveUp(nSecsPassed);
+				this.dir = 1;
 			}
+		} else {
+			this.dir = 0;
+		}
+	}
+
+	this.cpuPaddle.move = function(nSecsPassed) {
+		if (this.dir > 0) {
+			this.moveUp(nSecsPassed);
+		} else if (this.dir < 0){
+			this.moveDown(nSecsPassed);
 		}
 	}
 }
@@ -242,6 +256,9 @@ game.drawScore = function () {
 	context.fillText(game.playerScore, canvas.width * 3 / 4, 100)
 }
 
+game.N_FRAMES_BETWEEN_CPU_DECISION = 10;
+game.n_frames_from_last_decision = 0;
+
 game.updateGameState = function () {
 	this.ball.handleCollisionsWithWall();
 	this.playerPaddle.tryToHitBall(this.ball);
@@ -258,7 +275,13 @@ game.updateGameState = function () {
 			this.playerPaddle.moveDown(nSecsPassed);
 		}
 	}
-	this.cpuPaddle.move(nSecsPassed, this.ball);
+
+	if (this.n_frames_from_last_decision % this.N_FRAMES_BETWEEN_CPU_DECISION == 0) {
+		this.cpuPaddle.takeDecision(this.ball);
+		this.n_frames_from_last_decision = 0;
+	}
+
+	this.cpuPaddle.move(nSecsPassed);
 
 	var ret = this.ball.move(nSecsPassed, this.cpuPaddle, this.playerPaddle);
 
@@ -269,8 +292,7 @@ game.updateGameState = function () {
 	}
 }
 
-game.lastDrawnTime = null;
-
+game.lastDrawnTime = null; 
 game.drawGameState = function () {
 	context.clearRect(0, 0, canvas.width, canvas.height);
 	this.drawBoard();
@@ -286,10 +308,10 @@ game.drawGameState();
 game.turn = 1;
 
 game.start = function () {
-	console.log("hello");
-	this.ballStartVel.x *= this.turn;
-	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
 	this.turn *= -1;
+	this.ballStartVel.x *= this.turn;
+	// this.BALL_START_POS.x += this.turn * 40;
+	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
 	this.running = true;
 	game.drawGameState();
 }
