@@ -14,18 +14,29 @@ game.playerScore=0;
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
+var KEY_W = 87;
+var KEY_S = 83;
+var KEY_P = 80;
+var ARROW_UP = 26;
+var ARROW_DOWN = 28;
+
 function keyDownHandler(e) {
-    if (e.keyCode == 87) {
+    if (e.keyCode == KEY_W) {
         upPressed = true;
-    } else if (e.keyCode == 83) {
+    } else if (e.keyCode == KEY_S) {
         downPressed = true;
-    }
+    } else if (e.keyCode == KEY_P) {
+		game.isRunning = !game.isRunning;
+		if (game.isRunning == true) {
+			game.drawGameState();
+		}
+	}
 }
 
 function keyUpHandler(e) {
-    if (e.keyCode == 87) {
+    if (e.keyCode == KEY_W) {
         upPressed = false;
-    } else if (e.keyCode == 83) {
+    } else if (e.keyCode == KEY_S) {
         downPressed = false;
     }
 }
@@ -316,19 +327,19 @@ game.start = function () {
 	this.ballStartVel.x *= this.turn;
 	// this.BALL_START_POS.x += this.turn * 40;
 	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
-	this.running = true;
+	this.isRunning = true;
 	game.drawGameState();
 }
 
-game.running = true;
+game.isRunning = true;
 
 window.main = function () {
 	window.requestAnimationFrame(main);
-	if (game.running) {
+	if (game.isRunning) {
 		var ret = game.updateGameState();
 		game.drawGameState();
 		if (!ret) {
-			game.running = false;
+			game.isRunning = false;
 			game.ball.vel = new Velocity(0, 0);
 			setTimeout(function() {
 				window.game.start();
