@@ -17,7 +17,8 @@ game.playerScore=0;
 var KEY_W = 87;
 var KEY_S = 83;
 var KEY_P = 80;
-var KEY_R = 82
+var KEY_R = 82;
+var KEY_Q = 81;
 var ARROW_UP = 26;
 var ARROW_DOWN = 28;
 
@@ -26,13 +27,13 @@ function keyDownHandler(e) {
         window.upPressed = true;
     } else if (e.keyCode == KEY_S) {
         window.downPressed = true;
-    } else if (e.keyCode == KEY_P) {
+    } else if (e.keyCode == KEY_Q) {
 		window.game.isRunning = !game.isRunning;
 		if (window.game.isRunning == true) {
 			window.game.drawGameState();
 			$("#message").text("Score " + game.WINNING_SCORE + " to win!");
 		} else {
-			$("#message").text("Press P to start.");
+			$("#message").text("Press Q to start.");
 		}
 	} else if (e.keyCode == KEY_R) {
 		if (window.game.canStart == false) {
@@ -332,7 +333,7 @@ game.startGame = function () {
 	this.drawGameState();
 	this.winner = null;
 	this.isRunning = false;
-	$("#message").text("Press P to start.");
+	$("#message").text("Press Q to start.");
 }
 
 game.canStart = true;
