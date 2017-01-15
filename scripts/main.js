@@ -352,7 +352,7 @@ game.nextGame = function(previousWinner) {
 }
 
 window.main = function () {
-	window.requestAnimationFrame(main);
+	// window.requestAnimationFrame(main);
 	if (game.canStart && game.isRunning) {
 		var ret = game.updateGameState();
 		game.drawGameState();
@@ -370,4 +370,5 @@ window.main = function () {
 
 }
 
-main();
+// main();
+setInterval(main, 10);
