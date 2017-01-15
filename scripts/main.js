@@ -62,10 +62,10 @@ function Ball(pos, vel) {
 		var ret = true;
 		var dPos = new Pos(this.vel.x * dt, this.vel.y * dt);
 		if (this.pos.x + game.BALL_RADIUS < 0) {
-			game.playerScore += 1;
+			game.cpuScore += 1;
 			ret = false;
 		} else if (this.pos.x - game.BALL_RADIUS >= canvas.width) {
-			game.cpuScore += 1;
+			game.playerScore += 1;
 			ret = false;
 		}
 
@@ -212,13 +212,13 @@ game.CPU_PADDLE_START_POS = new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END
 game.PLAYER_PADDLE_START_POS =
 	new Pos(game.PADDLE_DIST_FROM_END, canvas.height / 2);
 game.BALL_START_SPEED = 350;
-game.ballStartVel = new Velocity(-game.BALL_START_SPEED, 0);
 
 game.ball = null;
 game.cpuPaddle = null;
 game.playerPaddle = null;
 
 game.initBoard = function () {
+	this.ballStartVel = new Velocity(-game.BALL_START_SPEED, 0);
 	this.ball = new Ball(this.BALL_START_POS, this.ballStartVel);
 	this.cpuPaddle = new Paddle(this.CPU_PADDLE_START_POS);
 	this.playerPaddle = new Paddle(this.PLAYER_PADDLE_START_POS);
@@ -248,7 +248,6 @@ game.initBoard = function () {
 	}
 }
 
-game.initBoard();
 
 game.drawBoard = function () {
 	context.beginPath();
@@ -265,8 +264,8 @@ game.drawScore = function () {
     context.font = "bolder 80px Arial";
     context.fillStyle = "white";
 	
-	context.fillText(game.cpuScore, canvas.width / 4 - 30, 330)
-	context.fillText(game.playerScore, canvas.width * 3 / 4 - 30, 330)
+	context.fillText(game.playerScore, canvas.width / 4 - 30, 330)
+	context.fillText(game.cpuScore, canvas.width * 3 / 4 - 30, 330)
 }
 
 game.N_FRAMES_BETWEEN_CPU_DECISION = 6;
@@ -319,10 +318,10 @@ game.drawGameState = function () {
 	this.lastDrawnTime = new Date().getTime();
 }
 
-game.drawGameState();
+// game.drawGameState();
 game.turn = 1;
 
-game.start = function () {
+game.serve = function () {
 	this.turn *= -1;
 	this.ballStartVel.x *= this.turn;
 	// this.BALL_START_POS.x += this.turn * 40;
@@ -332,6 +331,40 @@ game.start = function () {
 }
 
 game.isRunning = true;
+game.nextServe = function () {
+	game.ball.vel = new Velocity(0, 0);
+	setTimeout(function() {
+		window.game.serve();
+	}, 500);
+}
+
+game.WINNING_SCORE = 7;
+
+game.startGame = function () {
+	game.initBoard();
+	game.turn = 1;
+	game.n_frames_from_last_decision = 0;
+	game.isRunning = true;
+	game.cpuScore=0;
+	game.playerScore=0;
+	game.drawGameState();
+	game.winner = null;
+}
+
+game.startGame();
+game.nextGame = function(previousWinner) {
+	game.winner = previousWinner;
+	setTimeout(function() {
+		var ret = null;
+		if (previousWinner == "player") {
+			ret = window.confirm("You won! Restart game?");
+		} else {
+			ret = window.confirm("You lost! Restart game?");
+		}
+		game.startGame();
+		game.isRunning = ret;
+	}, 10);
+}
 
 window.main = function () {
 	window.requestAnimationFrame(main);
@@ -340,10 +373,13 @@ window.main = function () {
 		game.drawGameState();
 		if (!ret) {
 			game.isRunning = false;
-			game.ball.vel = new Velocity(0, 0);
-			setTimeout(function() {
-				window.game.start();
-			}, 500);
+			if (game.playerScore == game.WINNING_SCORE) {
+				game.nextGame("player");
+			} else if (game.cpuScore == game.WINNING_SCORE) {
+				game.nextGame("cpu");
+			} else {
+				game.nextServe();
+			}
 		}
 	}
 
