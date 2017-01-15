@@ -1,4 +1,5 @@
 var canvas = document.getElementById("game-canvas");
+canvas.focus();
 var context = canvas.getContext("2d");
 
 // variables to check if the up or down keys are pressed or not
@@ -40,6 +41,7 @@ function Velocity(vX, vY) {
 }
 
 game.BALL_RADIUS = 7;
+game.ballWallCollisionSound = new Audio("sounds/ball_wall_collision.wav");
 
 function Ball(pos, vel) {
 	this.pos = Object.assign({}, pos);
@@ -94,9 +96,11 @@ function Ball(pos, vel) {
 	this.handleCollisionsWithWall = function () {
 		if (this.pos.y <= game.BALL_RADIUS - 1 && this.vel.y < 0) {
 			this.vel.y = -this.vel.y;
+			game.paddleBallCollisionSound.play();
 		} else if (this.pos.y >= canvas.height - game.BALL_RADIUS &&
 			this.vel.y > 0) {
 			this.vel.y = -this.vel.y;
+			game.ballWallCollisionSound.play();
 		}
 	}
 
@@ -109,13 +113,16 @@ function Ball(pos, vel) {
 
 game.PADDLE_HALF_BREADTH = 5;
 game.PADDLE_HALF_LENGTH = 35;
-game.PADDLE_VELOCITY_Y = 300;
+game.PADDLE_VELOCITY_Y = 500;
 
 game.paddleBallCollisionSound = new Audio("sounds/paddle_ball_collision.wav");
 
 function Paddle(pos) {
 	this.pos = Object.assign({}, pos);
 	this.velY = game.PADDLE_VELOCITY_Y;
+
+	// max angle the ball will bounce when hitting the paddle
+	this.MAX_BALL_BOUNCE_ANGLE = Math.PI / 3;
 
 	this.moveUp = function(dt) {
 		var dy = this.velY * dt;
@@ -142,8 +149,7 @@ function Paddle(pos) {
 					ball.pos.y <= this.pos.y + game.PADDLE_HALF_LENGTH &&
 					ball.pos.x - game.BALL_RADIUS <= this.pos.x +
 						game.PADDLE_HALF_BREADTH) {
-				ball.vel.x = -ball.vel.x;
-				game.paddleBallCollisionSound.play();
+				this.handleCollision(ball);
 			}
 		} else {
 			if (ball.vel.x > 0 &&
@@ -151,16 +157,36 @@ function Paddle(pos) {
 					ball.pos.y <= this.pos.y + game.PADDLE_HALF_LENGTH &&
 					ball.pos.x + game.BALL_RADIUS >= this.pos.x -
 						game.PADDLE_HALF_BREADTH) {
-				ball.vel.x = -ball.vel.x;
-				game.paddleBallCollisionSound.play();
+				this.handleCollision(ball);
 			}
 		}
 	}
-	this.draw = function() {
+	this.draw = function () {
 		context.fillstyle = "white";
 		context.fillRect(this.pos.x - game.PADDLE_HALF_BREADTH,
 				this.pos.y - game.PADDLE_HALF_LENGTH,
 				2 * game.PADDLE_HALF_BREADTH, 2 * game.PADDLE_HALF_LENGTH);
+	}
+
+	this.calculateBounceAngle = function (ball) {
+		var relativeIntersectionY = this.pos.y - ball.pos.y;
+		var normalizedRelativeIntersectionY =
+			relativeIntersectionY / (game.PADDLE_HALF_LENGTH);
+		var bounceAngle = this.MAX_BALL_BOUNCE_ANGLE *
+			normalizedRelativeIntersectionY;
+		return bounceAngle;
+	}
+
+	this.handleCollision = function (ball) {
+		var angle = this.calculateBounceAngle(ball);
+		var ballSpeed =
+			Math.sqrt(ball.vel.x * ball.vel.x +
+					ball.vel.y * ball.vel.y);
+		ball.vel.x = -Math.sign(ball.vel.x) * ballSpeed *
+			Math.cos(angle);
+		ball.vel.y = -ballSpeed * Math.sin(angle);
+		// ball.vel.x = -ball.vel.x;
+		game.paddleBallCollisionSound.play();
 	}
 }
 
@@ -172,7 +198,7 @@ game.CPU_PADDLE_START_POS = new Pos(game.PADDLE_DIST_FROM_END,
 	canvas.height / 2); 
 game.PLAYER_PADDLE_START_POS =
 	new Pos(canvas.width - 1 - game.PADDLE_DIST_FROM_END, canvas.height / 2);
-game.ballStartVel = new Velocity(300, 300);
+game.ballStartVel = new Velocity(500, 500);
 
 game.ball = null;
 game.cpuPaddle = null;
