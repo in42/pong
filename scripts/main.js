@@ -11,9 +11,6 @@ var game = {};
 game.cpuScore=0;
 game.playerScore=0;
 
-document.addEventListener("keydown", keyDownHandler, false);
-document.addEventListener("keyup", keyUpHandler, false);
-
 var KEY_W = 87;
 var KEY_S = 83;
 var KEY_P = 80;
@@ -70,33 +67,6 @@ function Ball(pos, vel) {
 		}
 
 		var canMoveNormally = true;
-		//if (this.pos.y + dPos.y - game.BALL_RADIUS < 0) {
-		//	this.pos.y = game.BALL_RADIUS - 1;
-		//	this.pos.x += dPos.x;
-		//	canMoveNormally = false;
-		//} 
-		//if (this.pos.y + dPos.y + game.BALL_RADIUS >= canvas.height) {
-		//	this.pos.y = canvas.height - game.BALL_RADIUS;
-		//	this.pos.x += dPos.x;
-		//	canMoveNormally = false;
-		//} 
-		//if (leftPaddle.pos.x < this.pos.x &&
-		//	this.pos.y + dPos.y <= leftPaddle.pos.y + PADDLE_HALF_LENGTH &&
-		//	this.pos.y + dPos.y >= leftPaddle.pos.y - PADDLE_HALF_LENGTH &&
-		//	this.pos.x + dPos.x - game.BALL_RADIUS <= leftPaddle.pos.x + PADDLE_HALF_BREADTH) {
-		//	this.pos.x = leftPaddle.pos.x + PADDLE_HALF_BREADTH + game.BALL_RADIUS;
-		//	this.pos.y += dPos.y
-		//	canMoveNormally = false;
-		//}
-		//if (rightPaddle.pos.x > this.pos.x &&
-		//	this.pos.y <= rightPaddle.pos.y + PADDLE_HALF_LENGTH &&
-		//	this.pos.y >= rightPaddle.pos.y - PADDLE_HALF_LENGTH &&
-		//	this.pos.x + dPos.x + game.BALL_RADIUS >= rightPaddle.pos.x - PADDLE_HALF_BREADTH) {
-		//	this.pos.x = rightPaddle.pos.x - PADDLE_HALF_BREADTH - game.BALL_RADIUS;
-		//	this.pos.y += dPos.y
-		//	canMoveNormally = false;
-		//}
-
 		if (canMoveNormally) {
 			this.pos.x += dPos.x ;
 			this.pos.y += dPos.y ;
@@ -134,7 +104,7 @@ function Paddle(pos) {
 	this.velY = game.PADDLE_VELOCITY_Y;
 
 	// max angle the ball will bounce when hitting the paddle
-	this.MAX_BALL_BOUNCE_ANGLE = Math.PI / 3;
+	this.MAX_BALL_BOUNCE_ANGLE = Math.PI / 4;
 
 	this.moveUp = function(dt) {
 		var dy = this.velY * dt;
@@ -194,7 +164,7 @@ function Paddle(pos) {
 		// var ballSpeed =
 		// 	Math.sqrt(ball.vel.x * ball.vel.x +
 		// 			ball.vel.y * ball.vel.y);
-		var hitSpeed = 750;
+		var hitSpeed = 800;
 		ball.vel.x = -Math.sign(ball.vel.x) * hitSpeed *
 			Math.cos(angle);
 		ball.vel.y = -hitSpeed * Math.sin(angle);
@@ -268,7 +238,7 @@ game.drawScore = function () {
 	context.fillText(game.cpuScore, canvas.width * 3 / 4 - 30, 330)
 }
 
-game.N_FRAMES_BETWEEN_CPU_DECISION = 6;
+game.N_FRAMES_BETWEEN_CPU_DECISION = 12;
 game.n_frames_from_last_decision = 0;
 
 game.updateGameState = function () {
@@ -349,11 +319,16 @@ game.startGame = function () {
 	game.playerScore=0;
 	game.drawGameState();
 	game.winner = null;
+	document.addEventListener("keydown", keyDownHandler, false);
+	document.addEventListener("keyup", keyUpHandler, false);
+
 }
 
 game.startGame();
 game.nextGame = function(previousWinner) {
 	game.winner = previousWinner;
+	document.removeEventListener("keydown", keyDownHandler, false);
+	document.removeEventListener("keyup", keyUpHandler, false);
 	setTimeout(function() {
 		var ret = null;
 		if (previousWinner == "player") {
